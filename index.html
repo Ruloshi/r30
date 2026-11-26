@@ -785,8 +785,9 @@ body.light-theme .rt-cell.off { background: #ddd; }
 
   /* mint buttons: one big primary button, then the three variants, wallet box last; tap targets >= 46px */
   #btn-row > div:first-child > button { flex: 1 1 calc(50% - .3rem) !important; min-height: 46px; }
-  #btn-row > div:first-child > button[onclick="mintRandom()"] { flex: 1 1 100% !important; min-height: 56px; font-size: .78rem !important; letter-spacing: .08em !important; }
-  #btn-row > div:first-child > button[onclick="mintAlive()"], #btn-row > div:first-child > button[onclick="mintDead()"], #btn-row > div:first-child > button[onclick="mintNext()"] { flex: 1 1 calc(33.333% - .3rem) !important; font-size: .54rem !important; letter-spacing: .02em !important; white-space: normal !important; text-align: center; padding: .5rem .25rem !important; }
+  /* Alive = the big primary button, then Dead / Next / Random in one row, then the wallet box */
+  #btn-row > div:first-child > button[onclick="mintAlive()"] { flex: 1 1 100% !important; border: 1px solid #555 !important; min-height: 56px; font-size: .78rem !important; letter-spacing: .08em !important; }
+  #btn-row > div:first-child > button[onclick="mintDead()"], #btn-row > div:first-child > button[onclick="mintNext()"], #btn-row > div:first-child > button[onclick="mintRandom()"] { flex: 1 1 calc(33.333% - .3rem) !important; font-size: .54rem !important; letter-spacing: .02em !important; white-space: normal !important; text-align: center; padding: .5rem .25rem !important; }
   #btn-row > div:first-child > div[style*="width:1px"] { display: none !important; }
   #btn-row > div:first-child > .yb-box { flex: 1 1 100% !important; justify-content: center; }
 
@@ -819,7 +820,9 @@ body.light-theme .rt-cell.off { background: #ddd; }
   .agent-controls .agent-btns { grid-column: 1 / -1; display: flex; gap: .4rem; margin-top: .1rem; }
   .agent-controls .agent-btns button { flex: 1; min-height: 44px; }
 
-  /* rule table: horizontal, 4 per row = 2 lines */
+  /* rule table (RULE 30 + the 8 cases): not useful on a phone, hidden */
+  #rule-table { display: none !important; }
+  /* (kept below in case it is shown again) */
   #rule-table { padding: .9rem .6rem; }
   .rt-col { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; }
   .rt-bit { display: grid !important; grid-template-columns: 1fr 1fr; justify-items: center; align-items: center; gap: 4px 2px; padding: .45rem .1rem !important; flex: none !important; }
