@@ -759,7 +759,7 @@ body.light-theme .rt-cell.off { background: #ddd; }
 </script>
 <style>
 /* ── MOBILE EXPERIENCE (phones only: everything below is inside max-width 768px, or hidden above it) ── */
-.m-steps, #m-readmore, #m-mint-cta, #m-pyr-hint, #m-log-toggle { display: none; }
+.m-steps, #m-readmore, #m-mint-cta, #m-pyr-tools, #m-log-toggle, #m-disc-toggle { display: none; }
 @media (max-width: 768px) {
   /* title / intro */
   .shell-side { order: 1 !important; }
@@ -777,11 +777,15 @@ body.light-theme .rt-cell.off { background: #ddd; }
   .pyr-head > div span { white-space: normal !important; }
   #pyr-outer { justify-content: flex-start !important; }   /* a centered flex child wider than its box loses its left half; auto margins keep it scrollable */
   #pyr-canvas { margin: 0 auto; }
-  #m-pyr-hint { display: block !important; margin: 0 0 .5rem; font: 400 .66rem 'Space Mono', monospace; letter-spacing: .06em; color: #bdb8ad; text-align: center; }
+  #m-pyr-tools { display: flex !important; align-items: center; justify-content: space-between; gap: .6rem; margin: 0 0 .5rem; padding: .35rem .2rem; font: 400 .62rem 'Space Mono', monospace; letter-spacing: .04em; color: #bdb8ad; }
+  #m-pyr-tools .m-hint { flex: 1 1 auto; line-height: 1.4; }
+  #m-pyr-tools .m-zoom { flex: 0 0 auto; display: flex; align-items: center; gap: .45rem; padding: .2rem .6rem; background: #0f0f0f; border: 1px solid #2a2a2a; }
+  #m-pyr-tools .m-zoom .rt-zoom { width: 96px; height: 32px; }
+  #m-pyr-tools .m-zoom .rt-zoomval { align-self: center; font-size: .66rem; min-width: 2.2em; text-align: right; color: #fff; }
 
   /* mint buttons: one big primary button, then the three variants, wallet box last; tap targets >= 46px */
   #btn-row > div:first-child > button { flex: 1 1 calc(50% - .3rem) !important; min-height: 46px; }
-  #btn-row > div:first-child > button[onclick="mintRandom()"] { order: -1; flex: 1 1 100% !important; min-height: 56px; font-size: .78rem !important; letter-spacing: .08em !important; }
+  #btn-row > div:first-child > button[onclick="mintRandom()"] { flex: 1 1 100% !important; min-height: 56px; font-size: .78rem !important; letter-spacing: .08em !important; }
   #btn-row > div:first-child > button[onclick="mintAlive()"], #btn-row > div:first-child > button[onclick="mintDead()"], #btn-row > div:first-child > button[onclick="mintNext()"] { flex: 1 1 calc(33.333% - .3rem) !important; font-size: .54rem !important; letter-spacing: .02em !important; white-space: normal !important; text-align: center; padding: .5rem .25rem !important; }
   #btn-row > div:first-child > div[style*="width:1px"] { display: none !important; }
   #btn-row > div:first-child > .yb-box { flex: 1 1 100% !important; justify-content: center; }
@@ -799,6 +803,33 @@ body.light-theme .rt-cell.off { background: #ddd; }
   .r30-disclaimer p, .r30-disclaimer div, .r30-disclaimer span { color: #a09a90 !important; }
   .r30-disclaimer p, .r30-disclaimer div { text-align: left !important; }
   .r30-disclaimer > div > div:first-child { text-align: center !important; }
+  /* header centred */
+  nav { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: .45rem !important; text-align: center; }
+  nav .brand { justify-content: center; width: 100%; }
+  nav .nav-r { justify-content: center; flex-wrap: wrap; width: 100%; gap: .5rem 1rem; }
+
+  /* Agent Explorer: folded by default, Rule + Start on one line, 3 equal buttons */
+  .agent-title { position: relative; padding-right: 2.4rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .agent-title .m-arrow { position: absolute; right: .3rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #f0ebe0; transition: transform .2s; }
+  .agent-box:not(.m-closed) .agent-title .m-arrow { transform: translateY(-50%) rotate(180deg); }
+  .agent-box.m-closed > *:not(.agent-title) { display: none !important; }
+  .agent-controls { display: grid !important; grid-template-columns: 1fr 1fr; gap: .6rem !important; }
+  .agent-controls label { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+  .agent-controls select { width: 100%; min-height: 44px; }
+  .agent-controls .agent-btns { grid-column: 1 / -1; display: flex; gap: .4rem; margin-top: .1rem; }
+  .agent-controls .agent-btns button { flex: 1; min-height: 44px; }
+
+  /* rule table: horizontal, 4 per row = 2 lines */
+  #rule-table { padding: .9rem .6rem; }
+  .rt-col { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; }
+  .rt-bit { display: grid !important; grid-template-columns: 1fr 1fr; justify-items: center; align-items: center; gap: 4px 2px; padding: .45rem .1rem !important; flex: none !important; }
+  .rt-bit .rt-pattern { grid-column: 1 / -1; }
+  .rt-bit .rt-num { grid-column: 1 / -1; font-size: .6rem; }
+
+  /* disclaimer: short, unfolds with an arrow */
+  .r30-disclaimer.m-closed p { max-height: 6.2rem; overflow: hidden; position: relative; }
+  .r30-disclaimer.m-closed p::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2.4rem; background: linear-gradient(transparent, #050505); }
+  #m-disc-toggle { display: block; width: 100%; margin: .5rem 0 0; padding: .8rem 1rem; min-height: 46px; font: 700 .68rem 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #f0ebe0; background: #111; border: 1px solid #333; cursor: pointer; }
 }
 </style>
 </head>
@@ -4692,8 +4723,6 @@ try {
   }
 
   // 2) hint above the pyramid
-  var pw = document.getElementById('pyr-wrap');
-  if (pw) { var h = document.createElement('div'); h.id = 'm-pyr-hint'; h.textContent = '↔ Swipe to explore the pyramid · tap a cell to mint'; pw.parentNode.insertBefore(h, pw); }
 
   // 3) pyramid opens centred (apex in view)
   function centerPyr(){ var o = document.getElementById('pyr-outer'); if (o && o.scrollWidth > o.clientWidth) o.scrollLeft = (o.scrollWidth - o.clientWidth) / 2; }
@@ -4723,6 +4752,44 @@ try {
   window.addEventListener('scroll', upd, { passive: true }); window.addEventListener('resize', upd); setInterval(upd, 1500); upd();
 
   if (!isM) return;
+
+  // pyramid toolbar: hint on the left, zoom on the right (the zoom slider is moved here from the Rule panel)
+  var pw = document.getElementById('pyr-wrap');
+  var zs = document.getElementById('zoom-slider'), zv = document.getElementById('zoom-val');
+  if (pw && zs && zv) {
+    var tools = document.createElement('div'); tools.id = 'm-pyr-tools';
+    var hint = document.createElement('span'); hint.className = 'm-hint'; hint.textContent = '↔ Swipe to move · tap a cell to mint';
+    var zg = document.createElement('label'); zg.className = 'm-zoom'; zg.appendChild(document.createTextNode('Zoom')); zg.appendChild(zs); zg.appendChild(zv);
+    tools.appendChild(hint); tools.appendChild(zg); pw.parentNode.insertBefore(tools, pw);
+    // zoom that really enlarges the pyramid inside its scrolling box (the desktop transform does not add scroll room)
+    window.updateZoom = function(val){
+      var sc = parseFloat(val), o = document.getElementById('pyr-outer'), c = document.getElementById('pyr-canvas');
+      zv.textContent = val + 'x';
+      var rx = (o.scrollLeft + o.clientWidth / 2) / Math.max(1, c.offsetWidth), ry = (o.scrollTop + o.clientHeight / 2) / Math.max(1, c.offsetHeight);
+      c.style.transform = 'none'; c.style.width = (c.width * sc) + 'px'; c.style.height = (c.height * sc) + 'px';
+      o.scrollLeft = rx * c.offsetWidth - o.clientWidth / 2;
+      o.scrollTop = Math.max(0, ry * c.offsetHeight - o.clientHeight / 2);
+    };
+  }
+
+  // Agent Explorer folded by default, tap the title to open
+  var ab = document.querySelector('.agent-box'), at = ab && ab.querySelector('.agent-title');
+  if (ab && at) {
+    var ar = document.createElement('span'); ar.className = 'm-arrow'; ar.textContent = '▾'; at.appendChild(ar);
+    at.setAttribute('role', 'button'); at.setAttribute('aria-expanded', 'false');
+    ab.classList.add('m-closed');
+    at.addEventListener('click', function(){ var c = ab.classList.toggle('m-closed'); at.setAttribute('aria-expanded', c ? 'false' : 'true'); });
+  }
+
+  // disclaimer folded, unfolds with an arrow
+  var dc = document.querySelector('.r30-disclaimer');
+  if (dc) {
+    dc.classList.add('m-closed');
+    var db = document.createElement('button'); db.id = 'm-disc-toggle'; db.type = 'button';
+    var dl = function(){ db.textContent = dc.classList.contains('m-closed') ? 'Read the full disclaimer ▾' : 'Hide the disclaimer ▴'; };
+    dl(); db.addEventListener('click', function(){ dc.classList.toggle('m-closed'); dl(); });
+    dc.appendChild(db);
+  }
 
   // 6) no dead end: "connect your wallet first" opens the wallet picker instead of a bare browser alert
   var nativeAlert = window.alert.bind(window);
