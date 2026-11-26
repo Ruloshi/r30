@@ -757,6 +757,50 @@ body.light-theme .rt-cell.off { background: #ddd; }
   console.log('[R30] ethers source:', window.ethers ? 'local file' : 'CDN fallback');
   window.ethers || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"><\/script>');
 </script>
+<style>
+/* ── MOBILE EXPERIENCE (phones only: everything below is inside max-width 768px, or hidden above it) ── */
+.m-steps, #m-readmore, #m-mint-cta, #m-pyr-hint, #m-log-toggle { display: none; }
+@media (max-width: 768px) {
+  /* title / intro */
+  .shell-side { order: 1 !important; }
+  .hero .lead.m-more { display: none; }
+  .hero.m-open .lead.m-more { display: block; }
+  #m-readmore { display: inline-block; margin: .2rem 0 1rem; padding: .7rem 1rem; font: 700 .68rem 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #f0ebe0; background: #111; border: 1px solid #333; cursor: pointer; min-height: 44px; }
+  .m-steps { display: flex; flex-direction: column; gap: .5rem; margin: .4rem 0 1.1rem; padding: 0; list-style: none; }
+  .m-steps li { display: flex; align-items: center; gap: .75rem; padding: .65rem .8rem; background: #0b0b0b; border: 1px solid #222; font: 700 .74rem 'Space Mono', monospace; letter-spacing: .03em; color: #f0ebe0; }
+  .m-steps b { flex: 0 0 1.7rem; height: 1.7rem; border-radius: 50%; background: #d42a00; color: #fff; display: flex; align-items: center; justify-content: center; font: 700 .85rem 'Space Mono', monospace; }
+  .m-steps small { display: block; font-weight: 400; font-size: .62rem; color: #a8a39a; letter-spacing: .02em; margin-top: .1rem; }
+
+  /* pyramid section */
+  .pyr-head h2 { font-size: 1.25rem; line-height: 1.15; }
+  .pyr-head > div { flex-wrap: wrap !important; gap: .4rem .7rem !important; max-width: 100%; box-sizing: border-box; }
+  .pyr-head > div span { white-space: normal !important; }
+  #pyr-outer { justify-content: flex-start !important; }   /* a centered flex child wider than its box loses its left half; auto margins keep it scrollable */
+  #pyr-canvas { margin: 0 auto; }
+  #m-pyr-hint { display: block !important; margin: 0 0 .5rem; font: 400 .66rem 'Space Mono', monospace; letter-spacing: .06em; color: #bdb8ad; text-align: center; }
+
+  /* mint buttons: one big primary button, then the three variants, wallet box last; tap targets >= 46px */
+  #btn-row > div:first-child > button { flex: 1 1 calc(50% - .3rem) !important; min-height: 46px; }
+  #btn-row > div:first-child > button[onclick="mintRandom()"] { order: -1; flex: 1 1 100% !important; min-height: 56px; font-size: .78rem !important; letter-spacing: .08em !important; }
+  #btn-row > div:first-child > button[onclick="mintAlive()"], #btn-row > div:first-child > button[onclick="mintDead()"], #btn-row > div:first-child > button[onclick="mintNext()"] { flex: 1 1 calc(33.333% - .3rem) !important; font-size: .54rem !important; letter-spacing: .02em !important; white-space: normal !important; text-align: center; padding: .5rem .25rem !important; }
+  #btn-row > div:first-child > div[style*="width:1px"] { display: none !important; }
+  #btn-row > div:first-child > .yb-box { flex: 1 1 100% !important; justify-content: center; }
+
+  /* sticky mint button (below the wallet / mint windows) */
+  #m-mint-cta { display: none; position: fixed; left: 1rem; right: 1rem; bottom: calc(.8rem + env(safe-area-inset-bottom, 0px)); z-index: 400; min-height: 52px; padding: .95rem 1rem; border: 0; font: 700 .8rem 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: #fff; background: #d42a00; box-shadow: 0 4px 0 #7a1500, 0 8px 24px rgba(0,0,0,.6); cursor: pointer; }
+  #m-mint-cta.show { display: block; }
+
+  /* the long log / top minters / map block: collapsed until asked for */
+  .txlog.m-collapsed .txlog-grid, .txlog.m-collapsed #txlog-status { display: none; }
+  #m-log-toggle { display: block; width: 100%; margin: .4rem 0 .2rem; padding: .95rem 1rem; min-height: 52px; font: 700 .7rem 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #f0ebe0; background: #111; border: 1px solid #333; cursor: pointer; }
+
+  /* readable fine print */
+  .r30-disclaimer, .r30-disclaimer * { font-size: .68rem !important; line-height: 1.7 !important; }
+  .r30-disclaimer p, .r30-disclaimer div, .r30-disclaimer span { color: #a09a90 !important; }
+  .r30-disclaimer p, .r30-disclaimer div { text-align: left !important; }
+  .r30-disclaimer > div > div:first-child { text-align: center !important; }
+}
+</style>
 </head>
 <body>
 <div id="loading-overlay" style="position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;transition:opacity .4s;">
@@ -4617,6 +4661,89 @@ try {
     setInterval(play, 3 * 60 * 1000);                              // then every 3 minutes
   })();
 } catch (e) { console.log('[R30] brand effect error:', e && e.message); }
+</script>
+<script>
+// mobile: open the pyramid scrolled to its middle (apex in view) instead of its left edge
+(function(){
+  function centerPyr(){ var o=document.getElementById('pyr-outer'); if(o && o.scrollWidth>o.clientWidth) o.scrollLeft=(o.scrollWidth-o.clientWidth)/2; }
+  window.addEventListener('load', function(){ centerPyr(); setTimeout(centerPyr,1500); });
+})();
+</script>
+<script>
+// ── mobile experience (CSS hides or ignores all of this above 768px) ──
+(function(){
+  var isM = window.matchMedia('(max-width: 768px)').matches;
+  var hero = document.querySelector('.hero');
+
+  // 1) story folded behind a button + 3 simple steps
+  if (hero) {
+    var leads = hero.querySelectorAll('.lead');
+    if (leads.length >= 2) {
+      for (var i = 0; i < leads.length - 1; i++) leads[i].classList.add('m-more');
+      var steps = document.createElement('ul'); steps.className = 'm-steps';
+      steps.innerHTML = '<li><b>1</b><span>Connect your wallet<small>MetaMask or Phantom</small></span></li>' +
+                        '<li><b>2</b><span>Pick an agent<small>or tap “Mint Random”</small></span></li>' +
+                        '<li><b>3</b><span>Mint it · get 3,000 $R30<small>0.01 ETH per agent</small></span></li>';
+      var rb = document.createElement('button'); rb.id = 'm-readmore'; rb.type = 'button'; rb.textContent = 'Read the story ▾';
+      rb.addEventListener('click', function(){ var o = hero.classList.toggle('m-open'); rb.textContent = o ? 'Hide the story ▴' : 'Read the story ▾'; });
+      leads[0].parentNode.insertBefore(steps, leads[0]);
+      leads[0].parentNode.insertBefore(rb, leads[0]);
+    }
+  }
+
+  // 2) hint above the pyramid
+  var pw = document.getElementById('pyr-wrap');
+  if (pw) { var h = document.createElement('div'); h.id = 'm-pyr-hint'; h.textContent = '↔ Swipe to explore the pyramid · tap a cell to mint'; pw.parentNode.insertBefore(h, pw); }
+
+  // 3) pyramid opens centred (apex in view)
+  function centerPyr(){ var o = document.getElementById('pyr-outer'); if (o && o.scrollWidth > o.clientWidth) o.scrollLeft = (o.scrollWidth - o.clientWidth) / 2; }
+  window.addEventListener('load', function(){ centerPyr(); setTimeout(centerPyr, 1500); });
+
+  // 4) mint log / top minters / map folded behind a button
+  var tl = document.querySelector('.txlog');
+  if (tl) {
+    tl.classList.add('m-collapsed');
+    var lt = document.createElement('button'); lt.id = 'm-log-toggle'; lt.type = 'button';
+    var lbl = function(){ lt.textContent = tl.classList.contains('m-collapsed') ? 'Show mint log, top minters & map ▾' : 'Hide mint log, top minters & map ▴'; };
+    lbl(); lt.addEventListener('click', function(){ tl.classList.toggle('m-collapsed'); lbl(); });
+    var head = tl.querySelector('.txlog-head'); head.parentNode.insertBefore(lt, head.nextSibling);
+  }
+
+  // 5) sticky mint button
+  var cta = document.createElement('button'); cta.id = 'm-mint-cta'; cta.type = 'button';
+  cta.addEventListener('click', function(){ var t = document.querySelector('.pyr-section'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  document.body.appendChild(cta);
+  function upd(){
+    var t = document.querySelector('.pyr-section'); if (!t) return;
+    var closed = false; try { closed = (typeof mkMintClosed !== 'undefined' && mkMintClosed === true); } catch (e) {}
+    var price = ''; try { price = (typeof currentMintPriceETH !== 'undefined' && currentMintPriceETH) ? ' · ' + currentMintPriceETH + ' ETH' : ''; } catch (e) {}
+    cta.textContent = 'Mint an agent' + price + ' ↓';
+    cta.classList.toggle('show', !closed && t.getBoundingClientRect().top > window.innerHeight * 0.7);
+  }
+  window.addEventListener('scroll', upd, { passive: true }); window.addEventListener('resize', upd); setInterval(upd, 1500); upd();
+
+  if (!isM) return;
+
+  // 6) no dead end: "connect your wallet first" opens the wallet picker instead of a bare browser alert
+  var nativeAlert = window.alert.bind(window);
+  window.alert = function(msg){
+    if (typeof msg === 'string' && msg.indexOf('connect your wallet') !== -1 && typeof showWalletPicker === 'function') { try { showWalletPicker(); return; } catch (e) {} }
+    nativeAlert(msg);
+  };
+
+  // 7) shorter black loading screen on phones (the page stays usable; the chain data fills in)
+  setTimeout(function(){ var o = document.getElementById('loading-overlay'); if (o && o.parentNode) { o.style.opacity = '0'; setTimeout(function(){ if (o.parentNode) o.remove(); }, 400); } }, 5000);
+
+  // 8) save battery: the Agent Explorer animation stops while it is off screen
+  var cv = document.getElementById('agent-canvas');
+  if (cv && 'IntersectionObserver' in window && typeof agentPause === 'function' && typeof agentStart === 'function') {
+    var pausedByMe = false;
+    new IntersectionObserver(function(e){
+      if (!e[0].isIntersecting) { agentPause(); pausedByMe = true; }
+      else if (pausedByMe) { pausedByMe = false; agentStart(); }
+    }, { threshold: 0 }).observe(cv);
+  }
+})();
 </script>
 </body>
 </html>
