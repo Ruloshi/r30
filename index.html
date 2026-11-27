@@ -1164,6 +1164,19 @@ body.light-theme .rt-cell.off { background: #ddd; }
   #agent-canvas { max-width: 100%; }
   .badge { white-space: nowrap; max-width: 100%; box-sizing: border-box; justify-content: center; padding: .65rem .6rem; font-size: min(.82rem, calc((100vw - 56px) / 34)); }
 }
+
+/* iPhone paysage : badge centré, stats sur 4 colonnes, hero en 1 colonne */
+@media (max-width: 1000px) and (orientation: landscape) and (max-height: 500px) {
+  .hero { grid-template-columns: minmax(0,1fr) !important; gap: 1.5rem; }
+  .hero > *, .shell-side, .agent-box { min-width: 0; max-width: 100%; }
+  .badge { display: flex !important; width: fit-content; max-width: 100%; margin-left: auto !important; margin-right: auto !important; justify-content: center; text-align: center; }
+  .stats { grid-template-columns: repeat(4, 1fr) !important; }
+  .stat { padding: .6rem .2rem; min-width: 0; }
+  .stat .lbl, .stat-l, .stat [class*="lab"] { font-size: .6rem; }
+}
+@media (min-width: 481px) and (max-width: 768px) {
+  .stats { grid-template-columns: repeat(4, 1fr) !important; }
+  .badge { margin-left: auto !important; margin-right: auto !important; justify-content: center; }
 }
 </style>
 
