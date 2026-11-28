@@ -4531,11 +4531,14 @@ function resetBoxValue(el) {
   delete el.dataset.full;
   el.removeAttribute('title');
 }
+let _yaBusy = false, _yaAgain = false, _yaRetry = null;
 async function updateYourAgents() {
   const el = document.getElementById('s-yours');
   const elR30 = document.getElementById('s-yours-r30');
   if (!el) return;
   if (!wallet) { resetBoxValue(el); resetBoxValue(elR30); return; }
+  if (_yaBusy) { _yaAgain = true; return; }            // one read at a time: overlapping reads made the number jump
+  _yaBusy = true;
   try {
     const bal = await new window.ethers.Contract(CONTRACT_ADDRESS, TOKEN_MINI_ABI, getReadProvider()).balanceOf(wallet);
     const balNum = Number(bal) / 1e18; // R30 balance (tokens can be traded, so it is not the agent count)
@@ -4548,15 +4551,31 @@ async function updateYourAgents() {
       for (let c = center - r; c <= center + r; c++) if (minted[r][c]) cells.push({r, c});
     }
     const owners = await multicallRead('agentOwnerOf', cells.map(x => [x.r, x.c]));
-    myAgents = [];
-    cells.forEach((x, i) => {
-      if (owners[i] && owners[i].toLowerCase() === wallet.toLowerCase()) {
-        myAgents.push({r: x.r, c: x.c, alive: grid[x.r][x.c] === 1});
-      }
-    });
-    setBoxValue(el, myAgents.length);
-    renderMyAgents();
-  } catch(e) { resetBoxValue(el); }
+    // a chunk that failed on a public RPC leaves null answers: ask again for those cells only
+    for (let pass = 0; pass < 3; pass++) {
+      const miss = []; owners.forEach((o, i) => { if (!o) miss.push(i); });
+      if (!miss.length) break;
+      await _sleep(600 * (pass + 1));
+      const again = await multicallRead('agentOwnerOf', miss.map(i => [cells[i].r, cells[i].c]));
+      miss.forEach((i, k) => { owners[i] = again[k]; });
+    }
+    if (owners.some(o => !o)) {
+      // still incomplete: keep the number already shown (never show a partial count) and try again soon
+      clearTimeout(_yaRetry); _yaRetry = setTimeout(() => { try { updateYourAgents(); } catch (e) {} }, 8000);
+    } else {
+      const mine = [];
+      cells.forEach((x, i) => {
+        if (owners[i].toLowerCase() === wallet.toLowerCase()) mine.push({r: x.r, c: x.c, alive: grid[x.r][x.c] === 1});
+      });
+      myAgents = mine;
+      setBoxValue(el, myAgents.length);
+      renderMyAgents();
+    }
+  } catch(e) {
+    clearTimeout(_yaRetry); _yaRetry = setTimeout(() => { try { updateYourAgents(); } catch (e2) {} }, 8000);
+  }
+  _yaBusy = false;
+  if (_yaAgain) { _yaAgain = false; updateYourAgents(); }
 }
 
 
