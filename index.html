@@ -1394,7 +1394,7 @@ html.lt .pyr-head > div span[style*="color:#ccc"] { color: #333 !important; }
 html.lt .r30-disclaimer { border-top-color: #d5d0c5 !important; }
 html.lt .r30-disclaimer p { background: #ece8e0 !important; border-color: #d5d0c5 !important; color: #666 !important; }
 html.lt .r30-disclaimer p * { color: inherit; }
-html.lt #tx-map, html.lt .mk-chart canvas { filter: invert(1) hue-rotate(180deg); }
+html.lt .mk-chart canvas { filter: invert(1) hue-rotate(180deg); }
 html.lt #btn-wallet:not(.on) { color: #fff; }
 html.lt [style*="color:#bbb"] { color: #666 !important; }
 html.lt [style*="color:#ccc"] { color: #444 !important; }
@@ -1405,6 +1405,8 @@ html.lt #tx-list .rule i { border-color: #8a8a8a; }
 html.lt #tx-list .rule i.a { background: #0d0d0d; border-color: #0d0d0d; }
 html.lt #tx-list .rule i.d { background: #ffffff; border-color: #8a8a8a; }
 html.lt #tip { background: #000 !important; }
+html.lt .tx-legend i { outline: 1px solid rgba(0,0,0,.25); }
+html.lt .tx-legend i[style*="#ffffff"] { background: #000000 !important; }
 
 }
 </style>
@@ -2610,7 +2612,8 @@ function drawTxMap(me) {
   if (!cv || typeof minted === 'undefined') return;
   const ctx = cv.getContext('2d');
   const S = 2, H = 3;                                // each cell 2 x 3 px: 201 x 100 cells -> 402 x 300
-  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, cv.width, cv.height);
+  window.__txMe = me; const LT = document.documentElement.classList.contains('lt');
+  ctx.fillStyle = LT ? '#f5f2ec' : '#050505'; ctx.fillRect(0, 0, cv.width, cv.height);
   const center = Math.floor(COLS / 2);
   const mine = new Set(), latest = new Set();
   if (me) mintLog.forEach(x => { if (x.minter === me) mine.add(x.r + ',' + x.c); });
@@ -2620,10 +2623,10 @@ function drawTxMap(me) {
     for (let c = center - r; c <= center + r; c++) {
       const k = r + ',' + c, own = coordsToIndex(r, c) < OWNER_AGENTS_COUNT;
       let col;
-      if (mine.has(k) || (own && ownerIsMe)) col = '#ffffff';
+      if (mine.has(k) || (own && ownerIsMe)) col = LT ? '#000000' : '#ffffff';
       else if (latest.has(k)) col = '#ff3300';
       else if (own || minted[r][c]) col = '#8a2200';          // owner allocation counts as minted: no distinction
-      else col = '#101010';
+      else col = LT ? '#e4dfd3' : '#101010';
       ctx.fillStyle = col; ctx.fillRect(c * S, r * H, S, H);
     }
   }
