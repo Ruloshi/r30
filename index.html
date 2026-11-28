@@ -1407,6 +1407,8 @@ html.lt #tx-list .rule i.d { background: #ffffff; border-color: #8a8a8a; }
 html.lt #tip { background: #000 !important; }
 html.lt .tx-legend i { outline: 1px solid rgba(0,0,0,.25); }
 html.lt .tx-legend i[style*="#ffffff"] { background: #000000 !important; }
+html.lt .yb-box { color: #e8edf2; }
+html.lt .yb-box .yb-val { color: #ffffff; }
 
 }
 </style>
@@ -4883,7 +4885,26 @@ async function checkMintStarted() {
     setTimeout(checkMintStarted, 30000);                                   // check again until the owner opens the mint
   } catch (e) {}                                                           // older contract without mintStarted, or chain unreachable: say nothing
 }
-function startApp() { loadMintedCells(); checkMintStarted(); listenToMintEvents(); loadMintLog(0); restoreWallet(); fetchEthPrice(); setInterval(fetchEthPrice, 60000); setInterval(() => { if (!document.hidden && _mintLogState === 'ok') loadMintLog(1); }, 30000); }
+// Safety net for the live counter: event subscriptions on public RPCs sometimes drop, so re-read the total every 15 s
+let _pollBlock = null, _pollBusy = false;
+async function pollTotalMinted() {
+  if (_pollBusy || document.hidden || !window.ethers) return;
+  _pollBusy = true;
+  try {
+    const rc = new window.ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, getReadProvider());
+    const n = Number(await rc.totalAgentsMinted());
+    const head = parseInt(await rpcCall('eth_blockNumber', []), 16);
+    if (n > total) {
+      total = n; updateStats();                                   // the counter is right immediately
+      const from = _pollBlock || Math.max(0, head - 300);
+      try { await syncMintedFromLogs(from, head); drawPyramid(); saveMintedCache(head); } catch (e) {}
+      if (wallet) { try { updateYourAgents(); } catch (e) {} }
+    }
+    if (head) _pollBlock = head;
+  } catch (e) {}
+  _pollBusy = false;
+}
+function startApp() { loadMintedCells(); checkMintStarted(); listenToMintEvents(); loadMintLog(0); restoreWallet(); fetchEthPrice(); setInterval(fetchEthPrice, 60000); setInterval(() => { if (!document.hidden && _mintLogState === 'ok') loadMintLog(1); }, 30000); setInterval(pollTotalMinted, 15000); }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startApp);
 else startApp();
 
